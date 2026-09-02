@@ -14,6 +14,9 @@ vollog = logging.getLogger(__name__)
 
 SEVERITY_RANK = {"INFO": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}
 
+# Weight each distinct scored indicator contributes to the risk score.
+SEVERITY_WEIGHT = {"INFO": 0, "LOW": 1, "MEDIUM": 4, "HIGH": 10, "CRITICAL": 20}
+
 INDICATORS: Dict[str, Dict] = {
     # ----------------------------------------------------------------- HIGH
     "RANSOMWARE_FAMILY": {
