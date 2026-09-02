@@ -1,4 +1,4 @@
-# MalScan — indicator scanner with false-positive suppression
+# MalScan indicator scanner with false-positive suppression
 
 `windows.malscan.MalScan` scans a Windows memory image for malware, ransomware and
 attacker-tooling indicators in a single pass, then spends most of its effort deciding
@@ -7,10 +7,7 @@ which of those hits are worth an analyst's time.
 The scanning part is not the interesting part. Any string scanner will find
 `vssadmin delete shadows /all` and a dozen ransomware family names in a typical
 Windows image. The problem is that almost all of those hits are noise, and the noise
-looks exactly like a serious finding. On the two images used to develop this plugin,
-**13,201 of 13,401 raw hits were Microsoft Defender's own signature database** sitting
-resident in memory — every ransomware family name, every ransom-note phrase and every
-malicious command line it detects, present on a perfectly healthy machine.
+looks exactly like a serious finding. 
 
 MalScan exists to separate those.
 
@@ -19,7 +16,7 @@ MalScan exists to separate those.
 **Antivirus signature data (content).** Defender's detection-name database is
 recognised three ways: literal taxonomy markers near a hit (`Trojan:`, `Win32/`,
 `!MTB`, `#HSTR`), detection-name punctuation (`!Emotet`, `:Koadic`), and family-name
-density — four different family names inside one 64 KiB block is a signature database,
+density, four different family names inside one 64 KiB block is a signature database,
 not an infection. Contiguous regions are gap-closed up to 2 MiB, because much of the
 VDM is compressed and carries no literal marker.
 
@@ -109,30 +106,9 @@ requirement and scans the image flat, reporting itself as `LIMITED` throughout.
 One pass. A 2 GB image scans in roughly 40 seconds with the full indicator set;
 `--processes` adds about 30 seconds to map ~200,000 physical pages.
 
-## Known limitations
 
-- AV-process suppression matches on **image name only**. Malware named `MsMpEng.exe`
-  would inherit the exemption, so demoted hits stay visible rather than being dropped.
-- The indicator database is embedded in the source. Threat-intel ages; family names
-  and note filenames will need periodic updating.
-- The suppression thresholds (24-character command run, 64 KiB blocks, 2 MiB gap
-  closing, four names per block) are empirical, derived from the development images.
-- Validation to date is limited — see below.
+## Author
 
-## Validation status
+Omar Ebeid
 
-Developed and tested against two 2 GB Windows images. On both, the honest answer
-after filtering is that nothing survives as evidence owned by an ordinary process:
-`memdump1.raw` scores 0, and `imagery.raw` scores 0 once ownership is applied, with
-all seven previously-scored indicators traced to `MsMpEng.exe` (PID 1988) or
-`MemCompression` (PID 1332). The false-positive suppression is therefore well
-exercised; **true-positive behaviour on a confirmed infection is not yet
-demonstrated.**
 
-## Author and licence
-
-Omar Ebeid — originally built for CSE5800 (Advanced Topics in Computer Science),
-Florida Institute of Technology.
-
-Licensed under the Volatility Software License 1.0, matching the framework:
-<https://www.volatilityfoundation.org/license/vsl-v1.0>
